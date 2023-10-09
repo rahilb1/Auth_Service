@@ -1,10 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-const { SALT } = require("../config/serverConfig");
-const bcrypt = require("bcrypt");
-
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Role extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,39 +9,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.Role, {
+      this.belongsToMany(models.User, {
         through: "User_Roles" // Through table, or a third table used for many-to-many relationship. Automatically created by Sequelize using dbsync, but we can do it ourselves too using migrations.
       })
     }
   }
-  User.init(
+  Role.init(
     {
-      email: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-        },
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          len: [3, 100],
-        },
       },
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Role",
     }
   );
-
-  // Trigger event using Sequelize Hooks. Password encryption
-  User.beforeCreate((user) => {
-    const encryptedPassword = bcrypt.hashSync(user.password, SALT);
-    user.password = encryptedPassword;
-  });
-  return User;
+  return Role;
 };

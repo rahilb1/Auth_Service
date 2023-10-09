@@ -17,17 +17,17 @@ class UserService {
   }
   async signIn(email, plainPassword) {
     try {
-        // step 1 -> fetch the user using email
-        const user = await this.userRepository.getByEmail(email);
-        // step 2 -> compare the the incoming plain password with the stored encrypted password
-        const passwordsMatch = this.checkPassword(plainPassword, user.password);
-        if(!passwordsMatch){
-            console.log("Passwords don't match");
-            throw {error: "Incorrect password"};
-        }
-        // step 3 -> if passwords match, create a new JWT and return it
-        const newJWT = this.createToken({email: user.email, id: user.id});
-        return newJWT;
+      // step 1 -> fetch the user using email
+      const user = await this.userRepository.getByEmail(email);
+      // step 2 -> compare the the incoming plain password with the stored encrypted password
+      const passwordsMatch = this.checkPassword(plainPassword, user.password);
+      if (!passwordsMatch) {
+        console.log("Passwords don't match");
+        throw { error: "Incorrect password" };
+      }
+      // step 3 -> if passwords match, create a new JWT and return it
+      const newJWT = this.createToken({ email: user.email, id: user.id });
+      return newJWT;
     } catch (error) {
       console.log("Something went wrong in the sign in process");
       throw error;
@@ -40,10 +40,10 @@ class UserService {
         throw { error: "Invalid token" };
       }
       const user = await this.userRepository.getById(response.id);
-      if(!user){
-          throw {error: "No user with the corresponding token exists"};
+      if (!user) {
+        throw { error: "No user with the corresponding token exists" };
       }
-      return user.id
+      return user.id;
     } catch (error) {
       console.log("Something went wrong in the auth process");
       throw error;
@@ -73,6 +73,15 @@ class UserService {
       return bcrypt.compareSync(userInputPlainPassword, encryptedPassword);
     } catch (error) {
       console.log("Something went wrong in password comparison");
+      throw error;
+    }
+  }
+
+  isAdmin(userId) {
+    try {
+      return this.userRepository.isAdmin(userId);
+    } catch (error) {
+      console.log("Something went wrong in the service layer");
       throw error;
     }
   }
